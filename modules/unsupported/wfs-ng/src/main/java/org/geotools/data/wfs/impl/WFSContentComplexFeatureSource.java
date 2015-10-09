@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
@@ -37,6 +38,7 @@ import org.geotools.data.wfs.internal.GetFeatureRequest;
 import org.geotools.data.wfs.internal.WFSClient;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.util.logging.Logging;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
@@ -48,6 +50,10 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  */
 public class WFSContentComplexFeatureSource implements FeatureSource<FeatureType, Feature> {
+
+    private static final Logger LOGGER = Logging
+            .getLogger(WFSContentComplexFeatureSource.class);
+
     /**
      * The name of the feature type of the source.
      */
@@ -108,7 +114,7 @@ public class WFSContentComplexFeatureSource implements FeatureSource<FeatureType
         FeatureType schema = dataAccess.getSchema(typeName);
         QName name = dataAccess.getRemoteTypeName(typeName);
         request.setTypeName(new QName(query.getTypeName()));
-
+        request.setMaxFeatures(query.getMaxFeatures());
         request.setFullType(schema);
         request.setFilter(query.getFilter());
         request.setPropertyNames(query.getPropertyNames());
@@ -117,7 +123,7 @@ public class WFSContentComplexFeatureSource implements FeatureSource<FeatureType
         String srsName = null;
         CoordinateReferenceSystem crs = query.getCoordinateSystem();
         if (null != crs) {
-            System.err.println("Warning: don't forget to set the query CRS");
+            LOGGER.warning("Missing query CRS");
         }
 
         request.setSrsName(srsName);
